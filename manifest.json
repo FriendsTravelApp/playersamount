@@ -1,7 +1,7 @@
 {
   "name": "SPSIB Association Ledger",
   "short_name": "SPSIB Ledger",
-  "start_url": "./index.html",
+  "start_url": "/playersamount/"
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#831843",
