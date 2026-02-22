@@ -1,7 +1,8 @@
 {
   "name": "SPSIB Association Ledger",
   "short_name": "SPSIB Ledger",
-  "start_url": "/playersamount/"
+  "description": "Official financial ledger app for SPSIB Association to manage member contributions and expenses.",
+  "start_url": "/playersamount/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#831843",
