@@ -1,0 +1,1953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SPSIB Association - Professional Ledger</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+  :root {
+    --primary: #831843;
+    --accent: #db2777;
+    --table-bg: #fff1f2; 
+    --highlight-row: #f0fdf4; /* LIGHT MINT GREEN */
+    --border: #fbcfe8;
+    --text-main: #1e293b;
+    --color-collections: #166534; /* DARK GREEN */
+    --color-expenditure: #dc2626; /* BOLD RED */
+    --color-balance: #2563eb;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #fffafb;
+    color: var(--text-main);
+    margin: 0;
+    padding: 15px;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .app-container { max-width: 1100px; margin: auto; }
+
+  header.web-header, .print-header {
+    background: var(--primary);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  .logo-container { flex: 0 0 100px; display: flex; justify-content: flex-start; }
+
+  .logo-circle {
+    width: 80px; height: 80px; border-radius: 50%; border: 3px solid white;
+    background: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center;
+  }
+  .logo-circle img { width: 100%; height: 100%; object-fit: cover; }
+
+  .titles-container { flex: 1; text-align: center; padding-right: 100px; }
+
+  .print-header {
+    display: none; background: var(--primary) !important; color: white !important;
+    -webkit-print-color-adjust: exact;
+  }
+
+  input, select { 
+    padding: 12px; border: 1px solid var(--border); border-radius: 8px; 
+    font-weight: 800; font-size: 1.1rem; text-align: center;
+  }
+
+  .control-panel, .action-bar {
+    background: white; border: 1px solid var(--border); border-radius: 12px;
+    padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .input-group { display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--accent); }
+  
+  button { padding: 12px 16px; border-radius: 8px; font-weight: 800; cursor: pointer; border: none; }
+  .btn-save { background: var(--accent); color: white; }
+  .btn-print { background: #1e293b; color: white; display: flex; align-items: center; gap: 8px; font-size: 0.8rem; }
+
+  .checkbox-filter-container {
+    display: flex; flex-wrap: wrap; gap: 8px; background: #fff1f2; padding: 12px; border-radius: 10px; margin: 10px 0;
+  }
+  .month-checkbox-label {
+    display: flex; align-items: center; gap: 5px; font-size: 0.8rem; font-weight: 800; 
+    background: white; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border);
+  }
+
+  .report-card { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 25px; }
+  
+  .section-title {
+    font-weight: 800; color: var(--primary); margin: 30px 0 15px 0; font-size: 1.1rem;
+    border-left: 6px solid var(--accent); padding-left: 12px; text-transform: uppercase;
+  }
+
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; background: var(--table-bg); margin-bottom: 10px; min-width: 600px; }
+  th { background: var(--primary); color: white; padding: 12px; font-size: 0.8rem; border: 1px solid var(--border); }
+  td { padding: 10px; border: 1px solid var(--border); font-size: 0.95rem; text-align: center; font-weight: 600; }
+  
+  .member-name-cell { font-weight: 800 !important; text-align: center !important; text-transform: uppercase; font-size: 1rem; }
+
+  .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+  .sum-box { padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border); background: var(--table-bg); }
+  .sum-val { display: block; font-size: 2rem; font-weight: 800; }
+
+  /* MOBILE SPECIFIC BIG BOLD FONTS */
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .summary-grid { grid-template-columns: 1fr; }
+    .titles-container { padding-right: 0; }
+    .input-row-mobile { display: flex; flex-direction: column; gap: 8px; }
+    input, select, button { width: 100%; font-size: 1.3rem !important; font-weight: 900 !important; }
+    header.web-header { flex-direction: column; }
+    .logo-container { margin-bottom: 10px; }
+    
+    /* Bigger Table Fonts for Mobile */
+    td, th { font-size: 1.1rem !important; font-weight: 800 !important; }
+    .member-name-cell { font-size: 1.2rem !important; font-weight: 900 !important; }
+    .sum-val { font-size: 2.5rem !important; }
+    .section-title { font-size: 1.4rem !important; }
+  }
+
+  /* SLIDER OVERLAY */
+  .slider-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 99999; display: none; align-items: center; justify-content: center; }
+  .slider-content { position: relative; width: 95%; height: 85%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .slider-content img { max-width: 100%; max-height: 80%; object-fit: contain; border: 3px solid white; border-radius: 8px; }
+  .nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.3); color: white; border: none; font-size: 45px; padding: 15px; cursor: pointer; border-radius: 50%; }
+  .prev-btn { left: 10px; } .next-btn { right: 10px; }
+  .close-slider { position: absolute; top: -55px; right: 0; color: white; font-size: 50px; cursor: pointer; font-weight: 800; }
+  .image-mgmt-bar { margin-top: 15px; display: flex; gap: 10px; }
+  .btn-mgmt { padding: 8px 12px; font-size: 0.8rem; background: #fff; color: #000; border-radius: 6px; font-weight: 700; cursor: pointer; }
+  .btn-mgmt-del { background: #dc2626; color: #fff; }
+
+  @media print {
+    .hide-on-print { display: none !important; }
+    body { background: white; padding: 0; }
+    .report-card { border: none; padding: 0; }
+    .print-header { display: flex !important; }
+    .titles-container { padding-right: 80px; } 
+    .print-keep-together { break-inside: avoid; }
+    body.print-expense-only #matrix-sec, body.print-expense-only #matrix-title { display: none !important; }
+    td, th { border: 1px solid #000 !important; font-weight: 800 !important; font-size: 1.1rem !important; }
+    .print-collection-total { color: var(--color-collections) !important; font-weight: 900 !important; }
+    .print-expense-total { color: var(--color-expenditure) !important; font-weight: 900 !important; }
+    .highlight-cell-print { background-color: var(--highlight-row) !important; -webkit-print-color-adjust: exact; }
+    .member-name-cell { text-align: center !important; color: #000 !important; }
+    .table-responsive { overflow: visible; }
+  }
+
+/* ===== Soft Highlight Sections ===== */
+.section-soft {
+  padding: 18px;
+  border-radius: 14px;
+  border: 2px solid;
+  margin-top: 20px;
+}
+
+.soft-receipt {
+  background: #f6fdf8;
+  border-color: #d1fae5;
+}
+
+.soft-members {
+  background: #f5f9ff;
+  border-color: #dbeafe;
+}
+
+.soft-expense {
+  background: #fff7f8;
+  border-color: #ffe4e6;
+}
+
+
+
+/* ===== Updated Bottom Nav Icons ===== */
+
+.nav-item span {
+  display: none; /* remove emoji */
+}
+
+.nav-item img {
+  width: 26px;
+  height: 26px;
+  margin-bottom: 4px;
+  transition: 0.2s ease;
+}
+
+.nav-item.active img {
+  transform: scale(1.15);
+}
+
+.nav-item {
+  font-size: 0.65rem;
+}
+
+/* ========================= */
+/* MOBILE APP LAYOUT UPGRADE */
+
+/* ===== Updated Bottom Nav Icons ===== */
+
+.nav-item span {
+  display: none; /* remove emoji */
+}
+
+.nav-item img {
+  width: 26px;
+  height: 26px;
+  margin-bottom: 4px;
+  transition: 0.2s ease;
+}
+
+.nav-item.active img {
+  transform: scale(1.15);
+}
+
+.nav-item {
+  font-size: 0.65rem;
+}
+
+/* ========================= */
+
+body {
+  padding: 0;
+  background: #f8fafc;
+}
+
+.app-container {
+  padding-bottom: 90px;
+}
+
+.web-header {
+  border-radius: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 75px;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  z-index: 9999;
+}
+
+.nav-item {
+  flex: 1;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.nav-item span {
+  display: block;
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.nav-home span { color: #2563eb; }
+.nav-members span { color: #7c3aed; }
+.nav-receipt span { color: #16a34a; }
+.nav-expense span { color: #dc2626; }
+.nav-settings span { color: #f59e0b; }
+
+.nav-item.active span {
+  transform: scale(1.2);
+}
+
+.nav-item.active {
+  background: rgba(0,0,0,0.05);
+  border-radius: 12px;
+  padding: 6px 0;
+}
+
+
+/* ===== PREMIUM BOTTOM NAV ===== */
+
+.bottom-nav{
+  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.75);
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.nav-item{
+  font-size: 11px;
+  font-weight: 600;
+  color:#64748b;
+  transition: all .3s ease;
+  position:relative;
+}
+
+.nav-item img{
+  width:22px;
+  height:22px;
+  margin-bottom:2px;
+  transition: all .3s ease;
+}
+
+.nav-item.active{
+  color:#111827;
+}
+
+.nav-item.active img{
+  transform: translateY(-4px) scale(1.15);
+}
+
+.nav-item::after{
+  content:'';
+  position:absolute;
+  bottom:-6px;
+  left:50%;
+  transform:translateX(-50%);
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#6366f1;
+  opacity:0;
+  transition:.3s ease;
+}
+
+.nav-item.active::after{
+  opacity:1;
+}
+
+/* Smooth section transition */
+.control-panel,
+.report-card{
+  transition: all .35s ease;
+}
+
+
+/* ===== ICON ONLY NAV ===== */
+
+.nav-item{
+  font-size:0;
+}
+
+.nav-item img{
+  width:24px;
+  height:24px;
+  transition: all .35s cubic-bezier(.4,0,.2,1);
+}
+
+/* Morph Animation */
+.nav-item.active img{
+  transform: scale(1.25) rotate(8deg);
+  filter: drop-shadow(0 4px 10px rgba(99,102,241,.4));
+}
+
+/* Ripple Effect */
+.nav-item{
+  position:relative;
+  overflow:hidden;
+}
+
+.nav-item::before{
+  content:'';
+  position:absolute;
+  width:10px;
+  height:10px;
+  background:rgba(99,102,241,.3);
+  border-radius:50%;
+  transform:scale(0);
+  opacity:0;
+  pointer-events:none;
+}
+
+.nav-item:active::before{
+  animation:ripple .6s ease-out;
+}
+
+@keyframes ripple{
+  0%{transform:scale(0);opacity:.6;}
+  100%{transform:scale(15);opacity:0;}
+}
+
+
+/* ===== SLIM NEON NAV ===== */
+
+.bottom-nav{
+  height: 55px !important;
+  border-top-left-radius: 25px;
+  border-top-right-radius: 25px;
+  backdrop-filter: blur(18px);
+}
+
+.app-container{
+  padding-bottom: 65px !important;
+}
+
+/* Smaller icons */
+.nav-item img{
+  width:20px !important;
+  height:20px !important;
+}
+
+/* ===== NEON GLOW ACTIVE EFFECT ===== */
+
+.nav-item.active img{
+  transform: scale(1.25);
+  filter: drop-shadow(0 0 6px #00f0ff)
+          drop-shadow(0 0 12px #6366f1)
+          drop-shadow(0 0 18px #ff00ff);
+  animation: neonPulse 1.5s infinite alternate;
+}
+
+@keyframes neonPulse{
+  from{
+    filter: drop-shadow(0 0 4px #00f0ff)
+            drop-shadow(0 0 8px #6366f1)
+            drop-shadow(0 0 14px #ff00ff);
+  }
+  to{
+    filter: drop-shadow(0 0 8px #00f0ff)
+            drop-shadow(0 0 16px #6366f1)
+            drop-shadow(0 0 24px #ff00ff);
+  }
+}
+
+
+/* ===== PRO FLOATING DOCK DESIGN ===== */
+
+.bottom-nav{
+  height:70px !important;
+  bottom:15px !important;
+  left:50% !important;
+  transform:translateX(-50%);
+  width:92%;
+  border-radius:40px;
+  background:rgba(15,23,42,0.75);
+  backdrop-filter:blur(20px);
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.25),
+    inset 0 0 0 1px rgba(255,255,255,0.08);
+  padding:0 10px;
+}
+
+/* Curved glowing border */
+.bottom-nav::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:40px;
+  padding:1.5px;
+  background:linear-gradient(135deg,#00f0ff,#6366f1,#ff00ff,#00f0ff);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  animation: borderMove 6s linear infinite;
+}
+
+@keyframes borderMove{
+  0%{filter:hue-rotate(0deg);}
+  100%{filter:hue-rotate(360deg);}
+}
+
+/* Round icon buttons */
+.nav-item{
+  width:50px;
+  height:50px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:rgba(255,255,255,0.05);
+  transition:all .35s cubic-bezier(.4,0,.2,1);
+}
+
+/* Icon styling */
+.nav-item img{
+  width:22px !important;
+  height:22px !important;
+  transition:all .35s ease;
+}
+
+/* Active floating bubble effect */
+.nav-item.active{
+  background:linear-gradient(135deg,#6366f1,#9333ea);
+  box-shadow:
+    0 6px 20px rgba(99,102,241,.5),
+    0 0 15px rgba(147,51,234,.6);
+  transform:translateY(-8px) scale(1.05);
+}
+
+.nav-item.active img{
+  filter:brightness(1.2);
+}
+
+/* Hover lift (desktop preview) */
+.nav-item:hover{
+  transform:translateY(-5px);
+}
+
+
+/* ===== CLEAN CENTERED STICKY NAV ===== */
+
+.bottom-nav{
+  position:fixed !important;
+  bottom:0 !important;
+  left:0 !important;
+  transform:none !important;
+  width:100% !important;
+  height:60px !important;
+  border-radius:0 !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+  gap:35px;
+  background:linear-gradient(135deg,#0f172a,#1e293b);
+  box-shadow:0 -5px 20px rgba(0,0,0,0.3);
+  padding:0 !important;
+}
+
+/* Remove fancy border effects */
+.bottom-nav::before{
+  display:none !important;
+}
+
+/* Center round icons */
+.nav-item{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.06);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all .3s ease;
+}
+
+/* Icon size */
+.nav-item img{
+  width:22px !important;
+  height:22px !important;
+}
+
+/* Active glow */
+.nav-item.active{
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  box-shadow:0 0 12px rgba(139,92,246,.7);
+  transform:translateY(-4px);
+}
+
+
+/* ===== PERFECT CENTER ALIGN NAV ===== */
+
+.bottom-nav{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+  gap:30px !important;
+  height:60px !important;
+  background:#0f172a !important;
+  box-shadow:0 -4px 20px rgba(0,0,0,0.35);
+}
+
+/* Ensure icons are perfectly centered */
+.nav-item{
+  width:48px;
+  height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:transparent;
+  position:relative;
+}
+
+/* Icon size */
+.nav-item img{
+  width:22px !important;
+  height:22px !important;
+  transition:all .35s ease;
+}
+
+/* ===== ANIMATED GLOW FOR ACTIVE ICON ===== */
+
+.nav-item.active{
+  background:rgba(99,102,241,0.15);
+}
+
+.nav-item.active::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  box-shadow:
+    0 0 8px #6366f1,
+    0 0 16px #8b5cf6,
+    0 0 24px #06b6d4;
+  animation: glowPulse 1.5s infinite ease-in-out alternate;
+}
+
+@keyframes glowPulse{
+  from{
+    box-shadow:
+      0 0 6px #6366f1,
+      0 0 12px #8b5cf6,
+      0 0 18px #06b6d4;
+  }
+  to{
+    box-shadow:
+      0 0 12px #6366f1,
+      0 0 22px #8b5cf6,
+      0 0 32px #06b6d4;
+  }
+}
+
+.nav-item.active img{
+  transform:scale(1.15);
+}
+
+
+/* ===== REMOVE BLACK BG + SMALLER ICONS ===== */
+
+.bottom-nav{
+  background: linear-gradient(
+      180deg,
+      rgba(255,255,255,0.65) 0%,
+      rgba(255,255,255,0.35) 60%,
+      rgba(255,255,255,0.2) 100%
+  ) !important;
+
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  height:55px !important;
+  border-top-left-radius:22px;
+  border-top-right-radius:22px;
+
+  box-shadow:
+    0 -4px 15px rgba(0,0,0,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.7);
+}
+
+/* Smaller perfectly centered icons */
+.nav-item{
+  width:40px !important;
+  height:40px !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.nav-item img{
+  width:18px !important;
+  height:18px !important;
+}
+
+/* Keep animated glow but softer */
+.nav-item.active::before{
+  box-shadow:
+    0 0 6px #6366f1,
+    0 0 14px #8b5cf6,
+    0 0 20px #06b6d4;
+}
+
+
+/* ===== MICRO PAGE TRANSITION ===== */
+
+.section-animate {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+    transition: all .35s cubic-bezier(.4,0,.2,1);
+}
+
+.section-animate.active-section {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Slight fade for smooth feel */
+.control-panel,
+.report-card {
+    will-change: transform, opacity;
+}
+
+
+/* ===== CURVED LABEL TEXT ===== */
+
+.nav-item{
+  position:relative;
+  overflow:visible;
+}
+
+.nav-label-svg{
+  position:absolute;
+  bottom:-18px;
+  left:50%;
+  transform:translateX(-50%);
+  width:70px;
+  height:28px;
+  pointer-events:none;
+}
+
+.nav-label-text{
+  font-size:9px;
+  fill:#475569;
+  font-weight:600;
+  letter-spacing:.5px;
+}
+
+
+/* ===== WHITE CURVED BACKGROUND FIX ===== */
+
+.bottom-nav{
+    background:#ffffff !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+    height:65px !important;
+
+    border-top-left-radius:28px !important;
+    border-top-right-radius:28px !important;
+
+    box-shadow:0 -6px 20px rgba(0,0,0,0.08) !important;
+}
+
+/* Remove gradient/shine overlays */
+.bottom-nav::before,
+.bottom-nav::after{
+    display:none !important;
+}
+
+
+/* ===== GOLD LUXURY HEADER THEME ===== */
+
+.web-header{
+  background: linear-gradient(135deg,#3b2f1c,#8b6f2f,#d4af37,#f5e6a6);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  border-radius: 0 0 26px 26px;
+  border-bottom: 3px solid #d4af37;
+}
+
+#displayMainTitle{
+  font-size: 2rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.5px;
+  background: linear-gradient(90deg,#fff8dc,#ffd700,#ffffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 6px 18px rgba(0,0,0,0.45);
+}
+
+#displaySubTitle{
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fff3c4;
+  margin-top:8px;
+}
+
+#dateWeb{
+  font-size:0.8rem;
+  font-weight:700;
+  margin-top:6px;
+  color:#fff8dc;
+}
+
+/* Mobile refinement */
+@media (max-width:600px){
+  #displayMainTitle{
+    font-size:1.6rem !important;
+  }
+  #displaySubTitle{
+    font-size:0.85rem !important;
+    letter-spacing:1.5px;
+  }
+}
+
+
+@media print {
+  .bottom-nav {
+    display: none !important;
+  }
+}
+
+
+/* ===== HARD HIDE ACTIONS EVERYWHERE (PRINT + IMAGE) ===== */
+@media print {
+  th:last-child,
+  td:last-child {
+    display:none !important;
+  }
+}
+
+/* Hide actions during capture as well */
+.capture-hide-actions th:last-child,
+.capture-hide-actions td:last-child {
+  display:none !important;
+}
+
+
+@media print {
+  .main-header,
+  header,
+  .header-section {
+    display: block !important;
+    visibility: visible !important;
+  }
+}
+
+
+@media print {
+  th:last-child,
+  td:last-child {
+    display:none !important;
+  }
+}
+
+.capture-hide-actions th:last-child,
+.capture-hide-actions td:last-child {
+  display:none !important;
+}
+
+
+#sharePreviewModal img {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 90vh !important;
+}
+
+
+.thumb-col img{
+    width:40px;
+    height:40px;
+    object-fit:cover;
+    border-radius:6px;
+    margin-right:4px;
+}
+
+.actions button,
+.actions a{
+    font-size:11px !important;
+    padding:3px 6px !important;
+}
+
+@media screen and (max-width:768px){
+    .thumb-col img{
+        width:32px;
+        height:32px;
+    }
+}
+
+
+
+
+.thumb-wrap{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.thumb-wrap img{
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  object-fit:cover;
+  cursor:pointer;
+  margin:0 4px;
+  border:2px solid #ffffff;
+}
+
+
+.thumb-wrap img{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  object-fit:cover;
+  cursor:pointer;
+  border:2px solid #ffffff;
+}
+
+@media(max-width:600px){
+  
+.thumb-wrap{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.thumb-wrap img{
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  object-fit:cover;
+  cursor:pointer;
+  margin:0 4px;
+  border:2px solid #ffffff;
+}
+
+  .thumb-wrap img{
+    width:34px;
+    height:34px;
+    margin-left:-8px;
+  }
+  .thumb-wrap img:first-child{
+    margin-left:0;
+  }
+}
+
+
+@media(max-width:600px){
+  .thumb-wrap img{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  object-fit:cover;
+  cursor:pointer;
+}
+
+@media(max-width:600px){
+  .thumb-wrap img{
+    width:45px;
+    height:45px;
+  }
+}
+}
+
+
+.summary-grid{
+  display:flex !important;
+  justify-content:space-between;
+  gap:15px;
+}
+
+.summary-grid .sum-box{
+  flex:1;
+}
+
+
+.bottom-nav {
+  color: #222 !important;
+}
+
+.bottom-nav span,
+.bottom-nav p,
+.bottom-nav small {
+  color: #222 !important;
+  font-weight: 600;
+}
+
+</style>
+
+<!-- PWA CONFIG -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#831843">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="SPSIB Ledger">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js');
+  });
+}
+</script>
+
+</head>
+<body>
+
+<div class="slider-overlay" id="sliderOverlay">
+  <div class="slider-content">
+    <span class="close-slider" onclick="closeSlider()">×</span>
+    <button class="nav-btn prev-btn" onclick="changeSlide(-1)">‹</button>
+    <img id="sliderImg" src="">
+    <button class="nav-btn next-btn" onclick="changeSlide(1)">›</button>
+    <div id="slideCounter" style="color:white; font-weight:800; font-size: 1.2rem; margin-top: 10px;"></div>
+    
+    <div class="image-mgmt-bar hide-on-print">
+        <button class="btn-mgmt" onclick="document.getElementById('addMoreSlider').click()">➕ Add Photos</button>
+        <button class="btn-mgmt btn-mgmt-del" onclick="deleteCurrentImg()">🗑️ Delete This Photo</button>
+        <input type="file" id="addMoreSlider" accept="image/*" multiple hidden onchange="appendImagesFromSlider(this)">
+    </div>
+  </div>
+</div>
+
+<div class="app-container">
+  <header class="web-header hide-on-print">
+    <div class="logo-container">
+      <div class="logo-circle">
+        <img id="webLogo" src="https://via.placeholder.com/80?text=LOGO">
+      </div>
+    </div>
+    <div class="titles-container">
+      <div id="displayMainTitle" style="font-weight: 800; font-size: 1.8rem; font-family:'Playfair Display';">SPSIB ASSOCIATION</div>
+      <div id="displaySubTitle" style="font-size: 1rem; font-weight: 600; opacity: 0.9;">OFFICIAL FINANCIAL LEDGER</div>
+      
+    </div>
+  </header>
+
+  <div class="print-header" id="exportHeader">
+    <div class="logo-container">
+      <div class="logo-circle">
+        <img id="printLogo" src="">
+      </div>
+    </div>
+    <div class="titles-container">
+      <h1 id="printMainTitle" style="font-family:'Playfair Display'; font-size: 2.5rem; margin:0;">SPSIB ASSOCIATION</h1>
+      <p id="printSubTitle" style="font-weight:800; margin:5px 0; font-size: 1.2rem;">OFFICIAL FINANCIAL LEDGER</p>
+    </div>
+  </div>
+
+  <div class="control-panel hide-on-print">
+    <div class="input-group" style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px;">
+      <label>Tournament Branding Setup</label>
+      <div class="input-row-mobile" style="display:flex; gap:8px;">
+        <input type="text" id="setupMainTitle" placeholder="Change Main Title" style="flex:1">
+        <input type="text" id="setupSubTitle" placeholder="Change Sub Title" style="flex:1">
+        <input type="file" id="logoInput" accept="image/*" style="display:none" onchange="updateLogo(this)">
+        <button class="btn-save" style="background:#4b5563" onclick="document.getElementById('logoInput').click()">Set Logo</button>
+        <button class="btn-save" style="background:var(--primary)" onclick="saveTitles()">Apply Titles</button>
+      </div>
+    </div>
+
+    <div class="input-group section-soft soft-receipt">
+      <label>1. Record Member Receipt</label>
+      <div class="input-row-mobile" style="display:flex; gap:8px;">
+        <input type="number" id="pSno" placeholder="SNo" style="width:75px;" oninput="autoFillName()">
+        <input type="text" id="pName" placeholder="Enter Member Name" style="flex:2;">
+        <select id="pMonth" style="flex:1"></select>
+        <input type="number" id="pAmt" value="600" style="width:110px">
+        <button class="btn-save" onclick="addPayment()">Record</button>
+      </div>
+    </div>
+    
+    <div class="input-group section-soft soft-expense" style="margin-top:20px;">
+      <label>2. Manage Members List</label>
+      <div class="input-row-mobile" style="display:flex; gap:8px;">
+        <input type="text" id="newMember" placeholder="Name for New Member" style="flex:1">
+        <select id="memberSelect" style="flex:1"></select>
+        <button class="btn-save" onclick="addMember()">Add</button>
+        <button class="btn-save" style="background:#2563eb" onclick="renameMember()">Edit Name</button>
+        <button class="btn-save" style="background:#dc2626" onclick="deleteMember()">Delete</button>
+      </div>
+    </div>
+
+    <div class="input-group" style="margin-top:20px;">
+      <label>3. Add Expenditure Bill</label>
+      <div class="input-row-mobile" style="display:flex; gap:8px;">
+        <input type="date" id="eDate" style="flex:1">
+        <input type="text" id="eDesc" placeholder="BILL DESCRIPTION" style="flex:2">
+        <input type="number" id="eAmt" placeholder="Amount ₹" style="width:130px">
+        <input type="file" id="eImgs" accept="image/*" multiple style="flex:1">
+        <button class="btn-save" style="background:var(--primary)" onclick="addExpense()">Add Bill</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="adminControls" class="action-bar hide-on-print" style="display:none;">
+    <label style="margin-bottom:5px; display:block;">Display Filters (Check/Uncheck Months):</label>
+    <div id="checkboxGrid" class="checkbox-filter-container">
+      <label class="month-checkbox-label"><input type="checkbox" id="checkAll" checked onclick="toggleAll()"> ALL</label>
+    </div>
+    <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:15px;">
+      <button class="btn-print" onclick="window.print()">🖨️ Print PDF</button>
+      <button class="btn-print" style="background:#059669" onclick="saveAsImage()">📸 Save as Image (WhatsApp)</button>
+
+<button class="btn-print" style="background:#0f766e" onclick="previewMembersImage()">👥 Share Member List</button>
+<button class="btn-print" style="background:#7c2d12" onclick="previewExpenseImage()">📊 Share Expense + Summary</button>
+
+      <button class="btn-print" style="background:var(--color-expenditure)" onclick="printExpenseOnly()">🧾 Expense Only</button>
+      <button class="btn-print" style="background:var(--color-collections)" onclick="exportData()">📥 Backup Data</button>
+      <button class="btn-print" style="background:#7c3aed" onclick="document.getElementById('importFile').click()">📤 Import Data</button>
+      <input type="file" id="importFile" style="display:none" onchange="importData(this)">
+      <button class="btn-print" style="background:red" onclick="clearAllData()">🗑️ Reset All</button>
+    </div>
+  </div>
+
+  <div id="printArea" class="report-card">
+    <div id="captureContainer">
+        <div id="imageHeader" style="display:none; background:var(--primary); color:white; padding:20px; border-radius:12px; margin-bottom:10px; text-align:center;">
+             <h1 id="imgMainTitle" style="font-family:'Playfair Display'; margin:0;"></h1>
+             <p id="imgSubTitle" style="font-weight:800; margin:5px 0;"></p>
+        </div>
+
+        <div id="matrix-title" class="section-title">1. Member Contribution Matrix</div>
+        <div id="matrix-sec" class="table-responsive">
+          <table id="playerTable">
+            <thead><tr id="playerHead"><th>S.No</th><th>Member Name</th></tr></thead>
+            <tbody></tbody>
+            <tfoot id="playerFoot"></tfoot>
+          </table>
+        </div>
+
+        <div class="print-keep-together">
+          <div class="section-title">2. Expenditure Log</div>
+          <div class="table-responsive">
+            <table id="barrelTable">
+              <thead><tr><th>Date</th><th>Description (Click to View)</th><th>Amount (₹)</th><th>Bill Photos</th></tr></thead>
+              <tbody></tbody>
+              <tfoot id="barrelFoot"></tfoot>
+            </table>
+          </div>
+
+          <div class="section-title">3. Treasury Summary</div>
+          <div class="summary-grid">
+            <div class="sum-box"><span class="sum-val" id="totalIn" style="color:var(--color-collections)">₹0</span><label>Collections</label></div>
+            <div class="sum-box"><span class="sum-val" id="totalOut" style="color:var(--color-expenditure)">₹0</span><label>Expenditure</label></div>
+            <div class="sum-box"><span class="sum-val" id="totalBal" style="color:var(--color-balance)">₹0</span><label>Net Balance</label></div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const dbName = "SPSIB_Permanent_DB";
+let db, data = {players:{}, purchases:[], mainTitle: "SPSIB ASSOCIATION", subTitle: "OFFICIAL FINANCIAL LEDGER", logo: ""};
+const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+let currentImages = [], currentImgIdx = 0, currentActiveExpIdx = null;
+
+// IndexedDB Mobile-Stable connection
+const openDB = () => {
+    const request = indexedDB.open(dbName, 6);
+    request.onupgradeneeded = e => { 
+        if(!e.target.result.objectStoreNames.contains("store")) {
+            e.target.result.createObjectStore("store");
+        }
+    };
+    request.onsuccess = e => { db = e.target.result; loadData(); };
+};
+
+function loadData() {
+  const tx = db.transaction("store", "readonly");
+  tx.objectStore("store").get("ledger_data").onsuccess = e => {
+    if(e.target.result) data = e.target.result;
+    initApp();
+  };
+}
+
+function sync() {
+  const tx = db.transaction("store", "readwrite");
+  tx.objectStore("store").put(data, "ledger_data");
+  tx.oncomplete = () => renderUI();
+}
+
+function initApp() {
+  const now = new Date();
+  document.getElementById("eDate").valueAsDate = now;
+  document.getElementById("pMonth").innerHTML = months.map((m,i) => `<option value="${m}" ${i===now.getMonth()?'selected':''}>${m}</option>`).join("");
+  document.getElementById("setupMainTitle").value = data.mainTitle || "SPSIB ASSOCIATION";
+  document.getElementById("setupSubTitle").value = data.subTitle || "OFFICIAL FINANCIAL LEDGER";
+
+  const cbGrid = document.getElementById("checkboxGrid");
+  let cbHTML = `<label class="month-checkbox-label"><input type="checkbox" id="checkAll" checked onclick="toggleAll()"> ALL</label>`;
+  months.forEach(m => {
+    cbHTML += `<label class="month-checkbox-label"><input type="checkbox" class="m-cb" value="${m}" checked onclick="renderUI()"> ${m}</label>`;
+  });
+  cbGrid.innerHTML = cbHTML;
+  renderUI();
+}
+
+// SAVE AS IMAGE FUNCTION
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function saveAsImage() {
+
+    const bottomNav = document.querySelector(".bottom-nav");
+    const originalNav = bottomNav ? bottomNav.style.display : "";
+    if(bottomNav) bottomNav.style.display = "none";
+
+    const wrapper = document.createElement("div");
+    wrapper.style.background = "#ffffff";
+    wrapper.style.padding = "30px";
+
+    // HEADER
+    const header = document.querySelector(".web-header");
+    if(header) wrapper.appendChild(header.cloneNode(true));
+
+    // MEMBER MATRIX
+    const matrix = document.querySelector("#matrix-sec");
+    if(matrix) wrapper.appendChild(matrix.cloneNode(true));
+
+    // 🔥 EXPENDITURE LOG (capture the exact visible section container)
+    const expContainer = document.querySelector(".report-card");
+    if(expContainer) wrapper.appendChild(expContainer.cloneNode(true));
+
+    // TREASURY SUMMARY (avoid duplicate if inside report-card)
+    const treasury = document.querySelector(".summary-grid");
+    if(treasury && !wrapper.innerHTML.includes("summary-grid")){
+        wrapper.appendChild(treasury.cloneNode(true));
+    }
+
+    document.body.appendChild(wrapper);
+
+    html2canvas(wrapper, {
+        backgroundColor: "#ffffff",
+        scale: 2,
+        useCORS: true
+    }).then(canvas => {
+
+        canvas.toBlob(blob => {
+
+            const file = new File([blob], "SPSIB_Full_Home.png", {type:"image/png"});
+
+            if(navigator.canShare && navigator.canShare({files:[file]})){
+                navigator.share({
+                    files:[file],
+                    title: data.mainTitle
+                });
+            } else {
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = "SPSIB_Full_Home.png";
+                link.click();
+            }
+
+            document.body.removeChild(wrapper);
+            if(bottomNav) bottomNav.style.display = originalNav;
+
+        }, "image/png");
+
+    });
+}
+
+
+
+
+
+
+
+
+
+function saveTitles() {
+  data.mainTitle = document.getElementById("setupMainTitle").value;
+  data.subTitle = document.getElementById("setupSubTitle").value;
+  sync();
+}
+
+function updateLogo(input) {
+  if (input.files && input.files[0]) {
+    const r = new FileReader();
+    r.onload = e => { data.logo = e.target.result; sync(); };
+    r.readAsDataURL(input.files[0]);
+  }
+}
+
+function toggleAll() {
+  const val = document.getElementById("checkAll").checked;
+  document.querySelectorAll(".m-cb").forEach(cb => cb.checked = val);
+  renderUI();
+}
+
+function autoFillName() {
+  const sno = parseInt(document.getElementById("pSno").value);
+  const names = Object.keys(data.players).sort();
+  if(sno > 0 && sno <= names.length) document.getElementById("pName").value = names[sno-1];
+}
+
+function addMember() {
+  const n = document.getElementById("newMember").value.trim();
+  if(n && !data.players[n]) { data.players[n] = {}; document.getElementById("newMember").value = ""; sync(); }
+}
+
+function renameMember() {
+  const old = document.getElementById("memberSelect").value;
+  if(!old) return;
+  const nn = prompt("Rename " + old + " to:", old);
+  if(nn && nn !== old) { data.players[nn] = data.players[old]; delete data.players[old]; sync(); }
+}
+
+function deleteMember() {
+  const n = document.getElementById("memberSelect").value;
+  if(n && confirm("Delete records for " + n + "?")) { delete data.players[n]; sync(); }
+}
+
+function addPayment() {
+  const n = document.getElementById("pName").value.trim(), m = document.getElementById("pMonth").value, a = parseFloat(document.getElementById("pAmt").value);
+  if(!n || isNaN(a)) return;
+  if(!data.players[n]) data.players[n] = {};
+  data.players[n][m] = { amount: a };
+  document.getElementById("pName").value = ""; 
+  document.getElementById("pSno").value = ""; 
+  sync();
+}
+
+async function addExpense() {
+  const a = parseFloat(document.getElementById("eAmt").value), d = document.getElementById("eDate").value, ds = document.getElementById("eDesc").value.trim(), files = document.getElementById("eImgs").files;
+  if(isNaN(a) || !d) { alert("Please enter Date and Amount"); return; }
+  const imgs = [];
+  for(let f of files) imgs.push(await toBase64(f));
+  data.purchases.push({ date: d, description: ds, amount: a, images: imgs });
+  document.getElementById("eDesc").value = ""; document.getElementById("eAmt").value = ""; document.getElementById("eImgs").value = ""; 
+  sync();
+}
+
+async function editExpense(idx) {
+  const ex = data.purchases[idx];
+  const nDate = prompt("New Date:", ex.date);
+  const nDesc = prompt("New Description:", ex.description);
+  const nAmt = prompt("New Amount:", ex.amount);
+  if (nDate !== null) data.purchases[idx].date = nDate;
+  if (nDesc !== null) data.purchases[idx].description = nDesc;
+  if (nAmt !== null) data.purchases[idx].amount = parseFloat(nAmt);
+  sync();
+}
+
+const toBase64 = f => new Promise(res => { 
+  const r = new FileReader(); r.readAsDataURL(f); r.onload = () => res(r.result); 
+});
+
+function openSlider(idx) {
+  currentActiveExpIdx = idx;
+  currentImages = data.purchases[idx].images || [];
+  if(currentImages.length === 0) { 
+      if(confirm("Add photos?")) document.getElementById('addMoreSlider').click();
+      return; 
+  }
+  currentImgIdx = 0; updateSlider();
+  document.getElementById("sliderOverlay").style.display = "flex";
+}
+
+function updateSlider() {
+  if(currentImages.length === 0) { closeSlider(); return; }
+  document.getElementById("sliderImg").src = currentImages[currentImgIdx];
+  document.getElementById("slideCounter").innerText = `Image ${currentImgIdx + 1} of ${currentImages.length}`;
+}
+
+function changeSlide(dir) {
+  currentImgIdx = (currentImgIdx + dir + currentImages.length) % currentImages.length;
+  updateSlider();
+}
+
+function closeSlider() { document.getElementById("sliderOverlay").style.display = "none"; }
+
+function deleteCurrentImg() {
+    if(confirm("Remove image?")) {
+        data.purchases[currentActiveExpIdx].images.splice(currentImgIdx, 1);
+        currentImages = data.purchases[currentActiveExpIdx].images;
+        if(currentImages.length === 0) closeSlider();
+        else { currentImgIdx = 0; updateSlider(); }
+        sync();
+    }
+}
+
+async function appendImagesFromSlider(input) {
+    if(!input.files.length) return;
+    for(let f of input.files) data.purchases[currentActiveExpIdx].images.push(await toBase64(f));
+    currentImages = data.purchases[currentActiveExpIdx].images;
+    currentImgIdx = currentImages.length - 1; 
+    updateSlider(); sync();
+}
+
+function renderUI() {
+  const activeMonths = Array.from(document.querySelectorAll(".m-cb:checked")).map(cb => cb.value);
+  const names = Object.keys(data.players).sort();
+  
+  document.getElementById("displayMainTitle").innerText = data.mainTitle || "SPSIB ASSOCIATION";
+  document.getElementById("printMainTitle").innerText = data.mainTitle || "SPSIB ASSOCIATION";
+  document.getElementById("displaySubTitle").innerText = data.subTitle || "OFFICIAL FINANCIAL LEDGER";
+  document.getElementById("printSubTitle").innerText = data.subTitle || "OFFICIAL FINANCIAL LEDGER";
+  if(data.logo) {
+    document.getElementById("webLogo").src = data.logo;
+    document.getElementById("printLogo").src = data.logo;
+  }
+
+  document.getElementById("memberSelect").innerHTML = names.map(n => `<option value="${n}">${n}</option>`).join("");
+  document.getElementById("playerHead").innerHTML = "<th>S.No</th><th>Member Name</th>" + activeMonths.map(m => `<th>${m}</th>`).join("");
+  
+  const pBody = document.querySelector("#playerTable tbody"); 
+  pBody.innerHTML = "";
+  let monthSums = activeMonths.map(() => 0);
+
+  names.forEach((n, i) => {
+    let row = `<td>${i+1}</td><td class="member-name-cell">${n}</td>`;
+    activeMonths.forEach((m, mi) => {
+      const val = data.players[n][m]?.amount || 0;
+      monthSums[mi] += val;
+      const highlightClass = val >= 600 ? 'highlight-cell-print' : '';
+      const highlightStyle = val >= 600 ? 'background-color:var(--highlight-row);' : '';
+      row += `<td class="${highlightClass}" style="${highlightStyle} cursor:pointer;" onclick="editPay('${n}','${m}')">${val||'-'}</td>`;
+    });
+    pBody.innerHTML += `<tr>${row}</tr>`;
+  });
+  
+  
+  // ===== Monthly Expense Calculation =====
+  let monthExpenseSums = activeMonths.map(() => 0);
+
+  data.purchases.forEach(ex => {
+      if(!ex.date) return;
+      const dObj = new Date(ex.date);
+      const exMonth = months[dObj.getUTCMonth()];
+      const idx = activeMonths.indexOf(exMonth);
+      if(idx !== -1){
+          monthExpenseSums[idx] += parseFloat(ex.amount) || 0;
+      }
+  });
+
+  document.getElementById("playerFoot").innerHTML =
+    `<tr style="font-weight:900;">
+        <td colspan="2">CONTRIBUTIONS</td>
+        ${monthSums.map(s => `<td style="color:var(--color-collections)">₹${s}</td>`).join("")}
+     </tr>
+     <tr style="font-weight:900;">
+        <td colspan="2" style="color:var(--color-expenditure)">EXPENSES</td>
+        ${monthExpenseSums.map(s => `<td style="color:var(--color-expenditure)">₹${s}</td>`).join("")}
+     </tr>`;
+const eBody = document.querySelector("#barrelTable tbody"); 
+  eBody.innerHTML = "";
+  let totalOut = 0;
+  
+  data.purchases.forEach((ex, i) => {
+    const dObj = new Date(ex.date);
+    const exMonth = months[dObj.getUTCMonth()];
+    if(activeMonths.includes(exMonth)) {
+      totalOut += ex.amount;
+
+      let thumbHTML = "";
+
+      if(ex.images && ex.images.length > 0){
+          thumbHTML = `<div class="thumb-wrap">` +
+              ex.images.map(img => `
+                  <img src="${img}" onclick="openSlider(${i})">
+              `).join("") +
+          `</div>`;
+      } else {
+          thumbHTML = `<span style="color:#94a3b8;font-weight:600;">No Image</span>`;
+      }
+
+      eBody.innerHTML += `
+        <tr>
+          <td>${ex.date}</td>
+          <td class="member-name-cell"
+              style="cursor:pointer;color:var(--primary);text-decoration:underline;"
+              onclick="openSlider(${i})">
+              ${ex.description || 'No Description'}
+          </td>
+          <td style="font-weight:800;cursor:pointer;"
+              onmousedown="startPress(${i})"
+              onmouseup="cancelPress()"
+              ontouchstart="startPress(${i})"
+              ontouchend="cancelPress()">
+              ₹${ex.amount}
+          </td>
+          <td>${thumbHTML}</td>
+        </tr>
+      `;
+    }
+  });
+document.getElementById("barrelFoot").innerHTML = `<tr style="font-weight:900;"><td colspan="2" style="text-align:right">TOTAL EXPENDITURE</td><td class="print-expense-total" style="color:var(--color-expenditure)">₹${totalOut}</td><td class="hide-on-print"></td></tr>`;
+
+  let totalIn = 0;
+  Object.values(data.players).forEach(p => Object.values(p).forEach(v => totalIn += v.amount));
+  document.getElementById("totalIn").innerText = "₹" + totalIn.toLocaleString('en-IN');
+  document.getElementById("totalOut").innerText = "₹" + totalOut.toLocaleString('en-IN');
+  document.getElementById("totalBal").innerText = "₹" + (totalIn - totalOut).toLocaleString('en-IN');
+}
+
+function editPay(p, m) {
+  const cur = data.players[p][m]?.amount || "";
+  const v = prompt(`Editing ${p} for ${m}:`, cur);
+  if(v === null) return;
+  if(v === "" || v === "0") delete data.players[p][m];
+  else data.players[p][m] = { amount: parseFloat(v) };
+  sync();
+}
+
+
+function printExpenseOnly() {
+  const reportCard = document.querySelector(".report-card");
+  reportCard.style.display = "block";
+  document.body.classList.add("print-expense-only");
+  window.print();
+  setTimeout(()=>document.body.classList.remove("print-expense-only"), 500);
+}
+
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(data)], {type:"application/json"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); 
+  a.download = `SPSIB_Backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
+}
+
+function importData(input) {
+  const r = new FileReader();
+  r.onload = e => { try { data = JSON.parse(e.target.result); sync(); alert("Import Successful!"); } catch(err) { alert("Error parsing file."); } };
+  r.readAsText(input.files[0]);
+}
+
+function clearAllData() { 
+  const pass = prompt("Enter Password:");
+  if(pass === "2323") { data = {players:{}, purchases:[], mainTitle: "SPSIB ASSOCIATION", subTitle: "OFFICIAL FINANCIAL LEDGER", logo: ""}; sync(); }
+}
+
+
+let generatedBlob = null;
+let generatedFileName = "";
+
+
+
+async function previewMembersImage(){
+
+    const container = document.createElement("div");
+    container.style.background = "#ffffff";
+    container.style.padding = "30px";
+    container.style.width = "1200px";
+
+    const banner = createShareBanner();
+    container.appendChild(banner);
+
+    const content = document.getElementById("matrix-sec").cloneNode(true);
+    container.appendChild(content);
+
+    generateShareImage(container, "Member_List");
+}
+
+
+
+async function previewExpenseImage(){
+
+    const container = document.createElement("div");
+    container.style.background = "#ffffff";
+    container.style.padding = "30px";
+    container.style.width = "1200px";
+
+    const banner = createShareBanner();
+    container.appendChild(banner);
+
+    const expenseTable = document.querySelector("#barrelTable").cloneNode(true);
+    const summary = document.querySelector(".summary-grid").cloneNode(true);
+
+    container.appendChild(expenseTable);
+    container.appendChild(summary);
+
+    generateShareImage(container, "Expense_Summary");
+}
+
+async function generatePreview(contentElement, fileName){
+
+    const container = document.createElement("div");
+    container.style.background = "#ffffff";
+    container.style.padding = "30px";
+    container.style.width = "1200px";
+
+    const title = document.createElement("h1");
+    title.innerText = data.mainTitle;
+    title.style.textAlign = "center";
+    title.style.marginBottom = "5px";
+    title.style.fontFamily = "Playfair Display";
+
+    const sub = document.createElement("h3");
+    sub.innerText = data.subTitle;
+    sub.style.textAlign = "center";
+    sub.style.marginBottom = "20px";
+
+    const logo = document.createElement("img");
+    if(data.logo){
+        logo.src = data.logo;
+        logo.style.width = "100px";
+        logo.style.display = "block";
+        logo.style.margin = "0 auto 15px";
+    }
+
+    container.appendChild(logo);
+    container.appendChild(title);
+    container.appendChild(sub);
+    container.appendChild(contentElement.cloneNode(true));
+
+    document.body.appendChild(container);
+
+    const canvas = await html2canvas(container, {backgroundColor:"#ffffff",scale:2});
+
+    document.body.removeChild(container);
+
+    canvas.toBlob(blob=>{
+        generatedBlob = blob;
+        generatedFileName = fileName;
+        document.getElementById("previewImage").src = URL.createObjectURL(blob);
+        document.getElementById("sharePreviewModal").style.display = "flex";
+    },"image/png");
+}
+
+function closePreview(){
+    document.getElementById("sharePreviewModal").style.display = "none";
+}
+
+function downloadPreview(){
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(generatedBlob);
+    link.download = generatedFileName + ".png";
+    link.click();
+}
+
+async function confirmShare(){
+    const file = new File([generatedBlob], generatedFileName + ".png", {type:"image/png"});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],title:generatedFileName});
+    }else{
+        downloadPreview();
+        alert("Shared not supported. Image downloaded instead.");
+    }
+}
+
+
+
+function smoothScrollTo(element){
+  element.style.opacity="0";
+  setTimeout(()=>{
+    element.scrollIntoView({behavior:"smooth",block:"start"});
+    element.style.opacity="1";
+  },150);
+}
+
+
+// ===== MICRO TRANSITION HANDLER =====
+function animateSection(targetElement){
+    if(!targetElement) return;
+
+    targetElement.classList.add("section-animate");
+
+    setTimeout(()=>{
+        targetElement.classList.add("active-section");
+    },10);
+
+    setTimeout(()=>{
+        targetElement.classList.remove("section-animate");
+        targetElement.classList.remove("active-section");
+    },400);
+}
+
+
+
+function showSection(section, element) {
+
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  element.classList.add("active");
+
+  const controlPanel = document.querySelector(".control-panel");
+  const reportCard = document.querySelector(".report-card");
+  const adminControls = document.getElementById("adminControls");
+
+  const receiptSection = document.querySelector(".soft-receipt");
+  const membersSection = document.querySelector(".soft-expense");
+  const expenseSection = document.querySelector("#eDate").closest(".input-group");
+  const setupSection = document.querySelector("#setupMainTitle").closest(".input-group");
+
+  // Hide everything first
+  controlPanel.style.display = "none";
+  reportCard.style.display = "none";
+  adminControls.style.display = "none";
+
+  receiptSection.style.display = "none";
+  membersSection.style.display = "none";
+  expenseSection.style.display = "none";
+  setupSection.style.display = "none";
+
+  switch(section) {
+
+    case "home":
+      reportCard.style.display = "block";
+      break;
+
+    case "members":
+      controlPanel.style.display = "block";
+      membersSection.style.display = "block";
+      break;
+
+    case "receipt":
+      controlPanel.style.display = "block";
+      receiptSection.style.display = "block";
+      break;
+
+    case "expense":
+      controlPanel.style.display = "block";
+      expenseSection.style.display = "block";
+      break;
+
+    case "settings":
+      controlPanel.style.display = "block";
+      setupSection.style.display = "block";
+      adminControls.style.display = "block";
+      break;
+  }
+}
+
+
+
+
+
+// ===== CREATE CURVED TEXT LABELS =====
+document.addEventListener("DOMContentLoaded", function(){
+  document.querySelectorAll(".nav-item").forEach((item, index)=>{
+    const label = item.getAttribute("data-label");
+    if(!label) return;
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("viewBox", "0 0 100 40");
+    svg.setAttribute("class", "nav-label-svg");
+
+    const path = document.createElementNS(svgNS, "path");
+    const pathId = "curve"+index;
+    path.setAttribute("id", pathId);
+    path.setAttribute("d", "M10,30 A40,25 0 0,1 90,30");
+    path.setAttribute("fill", "transparent");
+
+    const text = document.createElementNS(svgNS, "text");
+    const textPath = document.createElementNS(svgNS, "textPath");
+    textPath.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#"+pathId);
+    textPath.setAttribute("startOffset", "50%");
+    textPath.setAttribute("text-anchor", "middle");
+    textPath.textContent = label;
+
+    text.setAttribute("class", "nav-label-text");
+
+    text.appendChild(textPath);
+    svg.appendChild(path);
+    svg.appendChild(text);
+
+    item.appendChild(svg);
+  });
+});
+
+
+
+document.addEventListener("DOMContentLoaded", function(){
+
+  // Force initial correct layout
+  const controlPanel = document.querySelector(".control-panel");
+  const reportCard = document.querySelector(".report-card");
+  const adminControls = document.getElementById("adminControls");
+
+  const receiptSection = document.querySelector(".soft-receipt");
+  const membersSection = document.querySelector(".soft-expense");
+  const expenseSection = document.querySelector("#eDate").closest(".input-group");
+  const setupSection = document.querySelector("#setupMainTitle").closest(".input-group");
+
+  controlPanel.style.display = "none";
+  adminControls.style.display = "none";
+
+  receiptSection.style.display = "none";
+  membersSection.style.display = "none";
+  expenseSection.style.display = "none";
+  setupSection.style.display = "none";
+
+  reportCard.style.display = "block";
+
+});
+
+
+
+/* ===== SAFE PRINT FIX ===== */
+window.addEventListener('beforeprint', function(){
+    document.querySelector(".report-card").style.display = "block";
+});
+
+window.addEventListener('afterprint', function(){
+    // Keep current section logic untouched
+});
+
+openDB();
+</script>
+
+<!-- SHARE PREVIEW MODAL -->
+<div id="sharePreviewModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999999;align-items:center;justify-content:center;flex-direction:column;">
+  <div style="background:#fff;padding:20px;border-radius:12px;max-width:95%;max-height:85%;overflow:auto;text-align:center;">
+    <img id="previewImage" style="max-width:100%;border:3px solid #000;border-radius:8px;">
+    <div style="margin-top:15px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button onclick="confirmShare()" style="padding:10px 18px;font-weight:800;background:#16a34a;color:#fff;border:none;border-radius:8px;">Share</button>
+      <button onclick="downloadPreview()" style="padding:10px 18px;font-weight:800;background:#2563eb;color:#fff;border:none;border-radius:8px;">Download</button>
+      <button onclick="closePreview()" style="padding:10px 18px;font-weight:800;background:#dc2626;color:#fff;border:none;border-radius:8px;">Close</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- MOBILE APP BOTTOM NAVIGATION -->
+<div class="bottom-nav hide-on-print">
+  <div class="nav-item nav-home active" data-label="Home" onclick="showSection('home', this)">
+    <span><img src="https://img.icons8.com/fluency/48/home.png"/></div>
+  <div class="nav-item nav-members" data-label="Members" onclick="showSection('members', this)">
+    <span><img src="https://img.icons8.com/fluency/48/conference-call.png"/></div>
+  <div class="nav-item nav-receipt" data-label="Contribution" onclick="showSection('receipt', this)">
+    <span><img src="https://img.icons8.com/fluency/48/add.png"/></div>
+  <div class="nav-item nav-expense" data-label="Expenses" onclick="showSection('expense', this)">
+    <span><img src="https://img.icons8.com/fluency/48/bill.png"/></div>
+  <div class="nav-item nav-settings" data-label="Admin" onclick="showSection('settings', this)">
+    <span><img src="https://img.icons8.com/fluency/48/settings.png"/></div>
+</div>
+
+
+<!-- LONG PRESS MODAL -->
+<div id="editModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:999999;align-items:center;justify-content:center;">
+  <div style="background:#fff;padding:20px;border-radius:12px;width:90%;max-width:400px;">
+    <h3 style="margin-bottom:15px;">Edit Expense</h3>
+
+    <label>Date</label>
+    <input type="date" id="editDate" style="width:100%;margin-bottom:10px;">
+
+    <label>Description</label>
+    <input type="text" id="editDesc" style="width:100%;margin-bottom:10px;">
+
+    <label>Amount</label>
+    <input type="number" id="editAmt" style="width:100%;margin-bottom:15px;">
+
+    <div style="display:flex;justify-content:space-between;">
+      <button onclick="saveExpenseEdit()" style="background:#16a34a;color:#fff;padding:8px 14px;border:none;border-radius:6px;">Save</button>
+      <button onclick="deleteExpenseRow()" style="background:#dc2626;color:#fff;padding:8px 14px;border:none;border-radius:6px;">Delete</button>
+      <button onclick="closeEditModal()" style="background:#64748b;color:#fff;padding:8px 14px;border:none;border-radius:6px;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let pressTimer;
+let selectedExpenseIndex = null;
+
+function startPress(index){
+  selectedExpenseIndex = index;
+  cancelPress();
+  pressTimer = setTimeout(()=>{
+    const ex = data.purchases[index];
+    document.getElementById("editDate").value = ex.date;
+    document.getElementById("editDesc").value = ex.description;
+    document.getElementById("editAmt").value = ex.amount;
+    document.getElementById("editModal").style.display="flex";
+  },600);
+}
+
+function cancelPress(){
+  clearTimeout(pressTimer);
+}
+
+function closeEditModal(){
+  document.getElementById("editModal").style.display="none";
+}
+
+function saveExpenseEdit(){
+  const ex = data.purchases[selectedExpenseIndex];
+  ex.date = document.getElementById("editDate").value;
+  ex.description = document.getElementById("editDesc").value;
+  ex.amount = parseFloat(document.getElementById("editAmt").value) || 0;
+  closeEditModal();
+  sync();
+}
+
+function deleteExpenseRow(){
+  if(confirm("Delete this expense permanently?")){
+    data.purchases.splice(selectedExpenseIndex,1);
+    closeEditModal();
+    sync();
+  }
+}
+</script>
+
+
+<script>
+
+function createShareBanner(){
+
+    const banner = document.createElement("div");
+    banner.style.background = "linear-gradient(135deg,#831843,#db2777)";
+    banner.style.color = "white";
+    banner.style.padding = "25px";
+    banner.style.borderRadius = "16px";
+    banner.style.textAlign = "center";
+    banner.style.marginBottom = "25px";
+
+    if(data.logo){
+        const logo = document.createElement("img");
+        logo.src = data.logo;
+        logo.style.width = "70px";
+        logo.style.height = "70px";
+        logo.style.borderRadius = "50%";
+        logo.style.objectFit = "cover";
+        logo.style.marginBottom = "10px";
+        banner.appendChild(logo);
+    }
+
+    const title = document.createElement("h1");
+    title.innerText = data.mainTitle;
+    title.style.margin = "5px 0";
+    banner.appendChild(title);
+
+    const sub = document.createElement("p");
+    sub.innerText = data.subTitle;
+    banner.appendChild(sub);
+
+    return banner;
+}
+
+
+
+
+function generateShareImage(container, fileName){
+
+    document.body.appendChild(container);
+
+    html2canvas(container, {
+        backgroundColor: "#ffffff",
+        scale: 2,
+        useCORS: true
+    }).then(canvas => {
+
+        canvas.toBlob(blob => {
+
+            const file = new File([blob], fileName + ".png", {type:"image/png"});
+
+            if(navigator.canShare && navigator.canShare({files:[file]})){
+                navigator.share({
+                    files:[file],
+                    title:data.mainTitle
+                });
+            } else {
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName + ".png";
+                link.click();
+            }
+
+            document.body.removeChild(container);
+
+        }, "image/png");
+
+    });
+}
+
+</script>
+
+</body>
+</html>
